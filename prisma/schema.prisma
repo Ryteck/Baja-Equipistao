@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(cuid())
+
+  name     String
+  nickname String @unique
+  pixKey   String
+  password String @default("")
+
+  admin  Boolean @default(false)
+  active Boolean @default(true)
+
+  raffles RaffleUser[]
+
+  @@map("users")
+}
+
+model Raffle {
+  id String @id @default(cuid())
+
+  name     String
+  price    Float
+  deadline DateTime?
+
+  users RaffleUser[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("raffles")
+}
+
+model RaffleUser {
+  id String @id @default(cuid())
+
+  userId   String @map("user_id")
+  raffleId String @map("raffle_id")
+
+  user   User   @relation(fields: [userId], references: [id])
+  raffle Raffle @relation(fields: [raffleId], references: [id])
+
+  active Boolean
+
+  tickets Ticket[]
+
+  @@unique([userId, raffleId])
+  @@map("raffle_users")
+}
+
+model Ticket {
+  id String @id @default(cuid())
+
+  price Float
+
+  name  String?
+  phone String?
+  email String?
+
+  raffleUserId String     @map("raffle_user_id")
+  raffleUser   RaffleUser @relation(fields: [raffleUserId], references: [id])
+
+  ticketNumbers TicketNumber[]
+
+  @@map("tickets")
+}
+
+model TicketNumber {
+  ticketId String @map("ticket_id")
+  ticket   Ticket @relation(fields: [ticketId], references: [id])
+
+  number Int
+
+  @@id([ticketId, number])
+  @@map("ticket_numbers")
+}

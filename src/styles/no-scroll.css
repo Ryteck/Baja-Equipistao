@@ -1,0 +1,10 @@
+/* Ocultar barras de rolagem padrão, mas manter a funcionalidade */
+* {
+    scrollbar-width: none; /* Para Firefox */
+    -ms-overflow-style: none; /* Para Internet Explorer e Edge */
+}
+
+/* Para WebKit (Chrome, Safari, etc.) */
+*::-webkit-scrollbar {
+    display: none;
+}
