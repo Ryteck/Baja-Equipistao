@@ -1,8 +1,8 @@
 "use client";
 
 import { Raffle } from "@prisma/client";
-import { format, getDate } from "date-fns";
-import { SendHorizonalIcon, TrashIcon, UsersRoundIcon } from "lucide-react";
+import { format } from "date-fns";
+import { SendHorizonalIcon } from "lucide-react";
 import Link from "next/link";
 import type { FC } from "react";
 import { RaffleForm } from "../forms/raffle";
@@ -12,11 +12,12 @@ import { RaffleParticipants } from "./participants";
 
 interface Props {
 	raffle: Raffle;
+	total: number;
 }
 
-export const RaffleRow: FC<Props> = ({ raffle }) => (
-	<TableRow key={raffle.id}>
-		<TableCell className="font-medium w-fit flex flex-col">
+export const RaffleRow: FC<Props> = ({ raffle, total }) => (
+	<TableRow>
+		<TableCell className="font-medium">
 			<p>{raffle.name}</p>
 			<span className="text-sm font-light text-foreground/40">{raffle.id}</span>
 		</TableCell>
@@ -47,7 +48,7 @@ export const RaffleRow: FC<Props> = ({ raffle }) => (
 		</TableCell>
 
 		<TableCell>
-			{Number(0).toLocaleString("pt-BR", {
+			{(total * raffle.price).toLocaleString("pt-BR", {
 				style: "currency",
 				currency: "BRL",
 			})}

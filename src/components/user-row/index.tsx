@@ -1,11 +1,9 @@
 "use client";
 
 import { User } from "@prisma/client";
-import { LockIcon } from "lucide-react";
 import type { FC } from "react";
 import { UserForm } from "../forms/user";
 import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
 import { TableCell, TableRow } from "../ui/table";
 import { ResetPassword } from "./reset-password";
 
@@ -14,8 +12,8 @@ interface Props {
 }
 
 export const UserRow: FC<Props> = ({ user }) => (
-	<TableRow key={user.id}>
-		<TableCell className="font-medium w-fit flex flex-col">
+	<TableRow>
+		<TableCell className="font-medium">
 			<p>{user.name}</p>
 			<span className="text-sm font-light text-foreground/40">{user.id}</span>
 		</TableCell>

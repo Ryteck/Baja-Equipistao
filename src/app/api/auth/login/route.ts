@@ -9,7 +9,11 @@ export async function POST(request: Request) {
 		where: { nickname, active: true },
 	});
 
-	if (user === null || !(await compareBHash(password, user.password))) {
+	if (
+		user === null ||
+		(user.encrypted && !(await compareBHash(password, user.password))) ||
+		(!user.encrypted && password !== user.password)
+	) {
 		return Response.json({ message: "Unauthorized" }, { status: 401 });
 	}
 

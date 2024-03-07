@@ -11,8 +11,35 @@ import prismaService from "@/services/prisma";
 import type { FC } from "react";
 
 const Page: FC = async () => {
-	const raffles = await prismaService.raffle.findMany({
-		orderBy: { createdAt: "asc" },
+	const [raffles, tickets, totalTicketNumbers] = await Promise.all([
+		prismaService.raffle.findMany({
+			orderBy: { createdAt: "asc" },
+		}),
+		prismaService.ticket.findMany({
+			select: { id: true, raffleUser: { select: { raffleId: true } } },
+			where: { paid: true },
+		}),
+		prismaService.ticketNumber.groupBy({
+			by: ["ticketId"],
+			where: { ticket: { paid: true } },
+			_count: true,
+		}),
+	]);
+
+	const parsedTickets = tickets.map((ticket) => {
+		const ticketNumber = totalTicketNumbers.find(
+			(totalTicketNumber) => ticket.id === totalTicketNumber.ticketId,
+		);
+
+		return { ...ticket, total: ticketNumber?._count ?? 0 };
+	});
+
+	const parsedRaffles = raffles.map((raffle) => {
+		const ticketTotal = parsedTickets.find(
+			(parsedTicket) => raffle.id === parsedTicket.raffleUser.raffleId,
+		);
+
+		return { ...raffle, total: ticketTotal?.total ?? 0 };
 	});
 
 	return (
@@ -37,8 +64,8 @@ const Page: FC = async () => {
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{raffles.map((raffle) => (
-						<RaffleRow key={raffle.id} raffle={raffle} />
+					{parsedRaffles.map(({ total, ...raffle }) => (
+						<RaffleRow key={raffle.id} raffle={raffle} total={total} />
 					))}
 				</TableBody>
 			</Table>

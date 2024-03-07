@@ -16,10 +16,11 @@ datasource db {
 model User {
   id String @id @default(cuid())
 
-  name     String
-  nickname String @unique
-  pixKey   String
-  password String @default("")
+  name      String
+  nickname  String  @unique
+  pixKey    String
+  password  String  @default("")
+  encrypted Boolean @default(true)
 
   admin  Boolean @default(false)
   active Boolean @default(true)
@@ -73,6 +74,8 @@ model Ticket {
   raffleUser   RaffleUser @relation(fields: [raffleUserId], references: [id])
 
   ticketNumbers TicketNumber[]
+
+  paid Boolean @default(false)
 
   @@map("tickets")
 }
